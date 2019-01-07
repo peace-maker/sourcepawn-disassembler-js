@@ -1,0 +1,4 @@
+/* Ignore Node cache and output folders */
+node_modules
+dist
+.vscode

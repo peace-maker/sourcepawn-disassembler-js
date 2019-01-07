@@ -1,0 +1,44 @@
+{
+  "name": "spdisas",
+  "version": "1.0.0",
+  "description": "Disassemble SourcePawn .smx files",
+  "main": "src/js/index.js",
+  "priavte": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "webpack-dev-server"
+  },
+  "keywords": [
+    "sourcepawn",
+    "disassembler",
+    "smx"
+  ],
+  "author": "Peace-Maker",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@types/bootstrap": "^4.1.2",
+    "@types/jquery": "^3.3.17",
+    "@types/node": "^10.11.7",
+    "autoprefixer": "^9.2.0",
+    "css-loader": "^1.0.0",
+    "mini-css-extract-plugin": "^0.4.4",
+    "node-sass": "^4.9.4",
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "ts-loader": "^5.2.2",
+    "tslint": "^5.11.0",
+    "tslint-loader": "^3.5.4",
+    "typescript": "^3.1.3",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9",
+    "zlib": "^1.0.5"
+  },
+  "dependencies": {
+    "bootstrap": "^4.1.3",
+    "html-webpack-plugin": "^3.2.0",
+    "jquery": "^3.3.1"
+  }
+}

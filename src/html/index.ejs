@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>
+        <%= htmlWebpackPlugin.options.title %>
+    </title>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <ul class="nav nav-tabs" id="top-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="new-tab" data-toggle="tab" href="#opennew" role="tab" aria-controls="new"
+                    aria-selected="true">New</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="main-tab-content">
+            <div class="tab-pane fade show active" id="opennew" role="tabpanel" aria-labelledby="new-tab">
+                <h1>
+                    <%= htmlWebpackPlugin.options.title %>
+                </h1>
+                Select .smx file to disassemble:
+                <input id="fileinput" type="file" />
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -66,28 +66,10 @@ export class SourcePawnFile {
 
   public unknownSections!: SectionEntry[];
 
-  private file: File;
   private bytes!: ArrayBuffer;
 
-  public constructor(file: File) {
-    this.file = file;
-    const reader = new FileReader();
-
-    reader.onload = ((spfile: SourcePawnFile) => {
-      return (ev: ProgressEvent) => {
-        if (ev.target == null) {
-          return;
-        }
-
-        if (reader.result == null) {
-          return;
-        }
-
-        spfile.OnFileLoaded(reader.result as ArrayBuffer);
-      };
-    })(this);
-
-    reader.readAsArrayBuffer(this.file);
+  public constructor(buffer: ArrayBuffer) {
+    this.OnFileLoaded(buffer);
   }
 
   public findGlobalName(address: number): string | null {

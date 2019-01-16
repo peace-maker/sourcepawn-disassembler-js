@@ -239,6 +239,43 @@ export class SmxLegacyDebugSymbolTable extends SmxSection {
     return signature;
   }
 
+  public findArguments(func: DebugSymbolEntry): DebugSymbolEntry[] {
+    return this.findReferencedVariables(func)[0];
+  }
+
+  public findLocals(func: DebugSymbolEntry): DebugSymbolEntry[] {
+    return this.findReferencedVariables(func)[1];
+  }
+
+  public findReferencedVariables(func: DebugSymbolEntry): DebugSymbolEntry[][] {
+    // Find symbols belonging to this address range.
+    const args: DebugSymbolEntry[] = [];
+    const locals: DebugSymbolEntry[] = [];
+    for (const sym of this.entries) {
+      if (sym.scope === SymScope.Global) {
+        continue;
+      }
+      if (sym.ident === SymKind.Function) {
+        continue;
+      }
+      if (sym.codestart < func.codestart || sym.codeend > func.codeend) {
+        continue;
+      }
+      // Only looking for arguments
+      if (sym.address < 0) {
+        locals.push(sym);
+      } else {
+        args.push(sym);
+      }
+    }
+
+    // We sort locals in reverse order, since the stack grows down.
+    args.sort((a, b) => a.address - b.address);
+    locals.sort((a, b) => a.codestart - b.codestart);
+
+    return [args, locals];
+  }
+
   private buildDatRefs(): void {
     if (this.datRefs.length > 0) {
       return;
@@ -255,31 +292,5 @@ export class SmxLegacyDebugSymbolTable extends SmxSection {
     }
 
     this.datRefs.sort((a, b) => a.address - b.address);
-  }
-
-  private findArguments(func: DebugSymbolEntry): DebugSymbolEntry[] {
-    // Find symbols belonging to this address range.
-    const args: DebugSymbolEntry[] = [];
-    for (const sym of this.entries) {
-      if (sym.scope === SymScope.Global) {
-        continue;
-      }
-      if (sym.ident === SymKind.Function) {
-        continue;
-      }
-      if (func.codestart < sym.codestart || func.codeend > sym.codeend) {
-        continue;
-      }
-      // Only looking for arguments
-      if (sym.address <= 0) {
-        continue;
-      }
-      args.push(sym);
-    }
-
-    // We sort locals in reverse order, since the stack grows down.
-    args.sort((a, b) => a.address - b.address);
-
-    return args;
   }
 }

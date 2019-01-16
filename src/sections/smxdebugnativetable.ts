@@ -1,16 +1,21 @@
 import { FileHeader } from '../fileheader';
 import { SectionEntry } from '../sectionentry';
+import { SymKind } from '../types';
 import { DebugNativeArgEntry } from '../types/debugnativeargentry';
 import { DebugNativeEntry } from '../types/debugnativeentry';
 import { DebugSymbolDimEntry } from '../types/debugsymboldimentry';
 import { SmxNameTable } from './smxnametable';
 import { SmxSection } from './smxsection';
+import { SmxTagTable } from './smxtagtable';
 
 export class SmxDebugNativeTable extends SmxSection {
   public entries: DebugNativeEntry[];
+  public tags: SmxTagTable;
 
-  public constructor(file: FileHeader, section: SectionEntry, names: SmxNameTable) {
+  public constructor(file: FileHeader, section: SectionEntry, names: SmxNameTable, tags: SmxTagTable) {
     super(file, section);
+
+    this.tags = tags;
 
     const view = new DataView(file.sectionReader(section));
     const numEntries = view.getUint32(0, true);
@@ -49,5 +54,65 @@ export class SmxDebugNativeTable extends SmxSection {
       }
       this.entries[i] = entry;
     }
+  }
+
+  public renderSignature(index: number): string {
+    if (index < 0 || index >= this.entries.length) {
+      throw new Error(`Invalid native index ${index}`);
+    }
+
+    const entry = this.entries[index];
+
+    let signature = '';
+    if (this.tags) {
+      const returnTag = this.tags.findTag(entry.tagid);
+      if (returnTag != null && returnTag.name !== '_') {
+        signature += returnTag.name + ':';
+      }
+    }
+
+    signature += entry.name + '(';
+
+    for (let i = 0; i < entry.nargs; i++) {
+      if (i > 0) {
+        signature += ', ';
+      }
+
+      const arg = entry.args[i];
+      if (arg.ident === SymKind.Reference) {
+        signature += '&';
+      }
+
+      if (this.tags) {
+        const argTag = this.tags.findTag(arg.tagid);
+        if (argTag != null && argTag.name !== '_') {
+          signature += argTag.name + ':';
+        }
+      }
+
+      if (arg.ident === SymKind.VarArgs) {
+        signature += '...';
+      } else {
+        signature += arg.name;
+      }
+      
+      for (let d = 0; d < arg.dimcount; d++) {
+        const dim = arg.dims[d];
+        signature += '[';
+        if (this.tags) {
+          const dimTag = this.tags.findTag(dim.tagid);
+          if (dimTag && dimTag.name !== '_') {
+            signature += dimTag.name + ':';
+          }
+        }
+        if (dim.size > 0) {
+          signature += dim.size;
+        }
+        signature += ']';
+      }
+    }
+    signature += ')';
+
+    return signature;
   }
 }

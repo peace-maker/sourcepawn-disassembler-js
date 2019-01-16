@@ -187,6 +187,14 @@ export class SourcePawnFile {
       }
     }
 
+    // Catch the tags section first.
+    for (const section of this.header.sections) {
+      if (section.name === '.tags') {
+        this.tags = new SmxTagTable(this.header, section, this.names);
+        break;
+      }
+    }
+
     // Track which functions were called in the code.
     // Finds functions missing from the debug sections.
     this.calledFunctions = new SmxCalledFunctionTable();
@@ -213,9 +221,6 @@ export class SourcePawnFile {
         case '.pubvars':
           this.pubvars = new SmxPubvarTable(this.header, section, this.names);
           break;
-        case '.tags':
-          this.tags = new SmxTagTable(this.header, section, this.names);
-          break;
         case '.data':
           this.data = new SmxDataSection(this.header, section);
           break;
@@ -229,7 +234,7 @@ export class SourcePawnFile {
           this.debugLines = new SmxDebugLineTable(this.header, section);
           break;
         case '.dbg.natives':
-          this.debugNatives = new SmxDebugNativeTable(this.header, section, this.debugNames);
+          this.debugNatives = new SmxDebugNativeTable(this.header, section, this.debugNames, this.tags);
           break;
         case '.dbg.symbols':
           this.debugSymbols = new SmxLegacyDebugSymbolTable(this.header, section, this.debugInfo, this.debugNames);

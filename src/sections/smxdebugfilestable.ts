@@ -26,17 +26,20 @@ export class SmxDebugFileTable extends SmxSection {
     }
   }
 
-  public findFile(addr: number): string {
+  public findFile(addr: number): string | null {
     let high = this.entries.length;
     let low = -1;
 
     while (high - low > 1) {
-      const mid = (low + high) / 2;
+      const mid = Math.floor((low + high) / 2);
       if (this.entries[mid].address <= addr) {
         low = mid;
       } else {
         high = mid;
       }
+    }
+    if (low === -1) {
+      return null;
     }
     return this.entries[low].name;
   }

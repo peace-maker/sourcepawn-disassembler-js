@@ -24,17 +24,21 @@ export class SmxDebugLineTable extends SmxSection {
     }
   }
 
-  public findLine(addr: number): number {
+  public findLine(addr: number): number | null {
     let high = this.entries.length;
     let low = -1;
 
     while (high - low > 1) {
-      const mid = (low + high) / 2;
+      const mid = Math.floor((low + high) / 2);
       if (this.entries[mid].address <= addr) {
         low = mid;
       } else {
         high = mid;
       }
+    }
+
+    if (low === -1) {
+      return null;
     }
 
     // "Since the CIP occurs BEFORE the line, we have to add one"

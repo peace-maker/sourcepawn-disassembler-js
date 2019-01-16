@@ -7,21 +7,29 @@ import { SymScope } from '../types/symscope';
 import { SmxDebugInfoSection } from './smxdebuginfosection';
 import { SmxNameTable } from './smxnametable';
 import { SmxSection } from './smxsection';
+import { SmxTagTable } from './smxtagtable';
 
 export class SmxLegacyDebugSymbolTable extends SmxSection {
   public entries: DebugSymbolEntry[];
   private datRefs: DebugSymbolEntry[];
+  private functionSymbols: DebugSymbolEntry[];
+  private globalVariables: DebugSymbolEntry[];
+  private tags: SmxTagTable;
 
-  public constructor(file: FileHeader, section: SectionEntry, info: SmxDebugInfoSection, names: SmxNameTable) {
+  public constructor(file: FileHeader, section: SectionEntry, info: SmxDebugInfoSection, names: SmxNameTable, tags: SmxTagTable) {
     super(file, section);
+
+    this.tags = tags;
 
     const view = new DataView(file.sectionReader(section));
     this.entries = [];
     this.datRefs = [];
+    this.functionSymbols = [];
+    this.globalVariables = [];
     let offset = 0;
     for (let i = 0; i < info.numSymbols; i++) {
       const entry = new DebugSymbolEntry();
-      entry.address = view.getUint32(offset, true);
+      entry.address = view.getInt32(offset, true);
       entry.tagid = view.getUint16(offset + 4, true);
       if (file.debugUnpacked) {
         offset += 2;
@@ -50,16 +58,44 @@ export class SmxLegacyDebugSymbolTable extends SmxSection {
     }
   }
 
-  public findFunction(address: number): DebugSymbolEntry | null {
+  public get functions(): DebugSymbolEntry[] {
+    if (this.functionSymbols.length > 0) {
+      return this.functionSymbols;
+    }
+
     for (const entry of this.entries) {
       if (entry.ident !== SymKind.Function) {
         continue;
       }
-      if (address >= entry.codestart && address <= entry.codeend) {
-        return entry;
+
+      this.functionSymbols.push(entry);
+    }
+    return this.functionSymbols;
+  }
+
+  public findFunction(address: number): DebugSymbolEntry | null {
+    for (const fun of this.functions) {
+      if (address >= fun.codestart && address <= fun.codeend) {
+        return fun;
       }
     }
     return null;
+  }
+
+  get globals(): DebugSymbolEntry[] {
+    if (this.globalVariables.length > 0) {
+      return this.globalVariables;
+    }
+
+    this.buildDatRefs();
+    for (const entry of this.datRefs) {
+      if (entry.scope !== SymScope.Global) {
+        continue;
+      }
+
+      this.globalVariables.push(entry);
+    }
+    return this.globalVariables;
   }
 
   public findStackRef(codeaddr: number, stackaddr: number): DebugSymbolEntry | null {
@@ -139,6 +175,70 @@ export class SmxLegacyDebugSymbolTable extends SmxSection {
     return null;
   }
 
+  public renderVariable(sym: DebugSymbolEntry): string {
+    let output = '';
+
+    if (sym.scope === SymScope.Static) {
+      output += 'static ';
+    }
+
+    if (sym.ident === SymKind.Reference) {
+      output += '&';
+    }
+
+    if (this.tags) {
+      const tag = this.tags.findTag(sym.tagid);
+      if (tag && tag.name !== '_') {
+        output += tag.name + ':';
+      }
+    }
+
+    output += sym.name;
+    
+    for (let d = 0; d < sym.dimcount; d++) {
+      const dim = sym.dims[d];
+      output += '[';
+      if (this.tags) {
+        const dimTag = this.tags.findTag(dim.tagid);
+        if (dimTag && dimTag.name !== '_') {
+          output += dimTag.name + ':';
+        }
+      }
+      if (dim.size > 0) {
+        output += dim.size;
+      }
+      output += ']';
+    }
+
+    return output;
+  }
+
+  public renderFunction(sym: DebugSymbolEntry): string {
+    let signature = '';
+
+    if (sym.scope === SymScope.Static) {
+      signature += 'static ';
+    }
+
+    if (this.tags) {
+      const returnTag = this.tags.findTag(sym.tagid);
+      if (returnTag && returnTag.name !== '_') {
+        signature += returnTag.name + ':';
+      }
+    }
+
+    signature += sym.name;
+
+    const args = [];
+    for (const arg of this.findArguments(sym)) {
+      args.push(this.renderVariable(arg));
+    }
+
+    signature += '(' + args.join(', ') + ')';
+
+    return signature;
+  }
+
   private buildDatRefs(): void {
     if (this.datRefs.length > 0) {
       return;
@@ -155,5 +255,31 @@ export class SmxLegacyDebugSymbolTable extends SmxSection {
     }
 
     this.datRefs.sort((a, b) => a.address - b.address);
+  }
+
+  private findArguments(func: DebugSymbolEntry): DebugSymbolEntry[] {
+    // Find symbols belonging to this address range.
+    const args: DebugSymbolEntry[] = [];
+    for (const sym of this.entries) {
+      if (sym.scope === SymScope.Global) {
+        continue;
+      }
+      if (sym.ident === SymKind.Function) {
+        continue;
+      }
+      if (func.codestart < sym.codestart || func.codeend > sym.codeend) {
+        continue;
+      }
+      // Only looking for arguments
+      if (sym.address <= 0) {
+        continue;
+      }
+      args.push(sym);
+    }
+
+    // We sort locals in reverse order, since the stack grows down.
+    args.sort((a, b) => a.address - b.address);
+
+    return args;
   }
 }

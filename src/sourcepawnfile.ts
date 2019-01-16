@@ -237,7 +237,7 @@ export class SourcePawnFile {
           this.debugNatives = new SmxDebugNativeTable(this.header, section, this.debugNames, this.tags);
           break;
         case '.dbg.symbols':
-          this.debugSymbols = new SmxLegacyDebugSymbolTable(this.header, section, this.debugInfo, this.debugNames);
+          this.debugSymbols = new SmxLegacyDebugSymbolTable(this.header, section, this.debugInfo, this.debugNames, this.tags);
           break;
         case '.dbg.methods':
           this.debugMethods = new SmxDebugMethodTable(this.header, section);

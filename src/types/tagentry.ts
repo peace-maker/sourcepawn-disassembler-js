@@ -28,11 +28,11 @@ export class TagEntry {
   // Computed name.
   public name!: string;
 
-  get id(): number {
+  public get id(): number {
     return this.tag & ~this.FLAGMASK;
   }
 
-  get flags(): TagFlags {
+  public get flags(): TagFlags {
     return (this.tag & this.FLAGMASK) as TagFlags;
   }
 }

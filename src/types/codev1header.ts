@@ -2,6 +2,12 @@ export enum CodeV1Flags {
   Debug = 0x00000001,
 }
 
+export enum CodeV1Features {
+  // This feature adds the REBASE opcode, and requires that multi-dimensional
+  // arrays use direct internal addressing.
+  DirectArrays = (1 << 0),
+}
+
 export class CodeV1Header {
   public static readonly Size: number = 16;
 
@@ -27,5 +33,6 @@ export class CodeV1Header {
   // Offset to the code section.
   public codeoffs!: number;
 
+  // Feature set.
   public features!: number;
 }

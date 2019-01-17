@@ -186,8 +186,9 @@ export class SmxLegacyDebugSymbolTable extends SmxSection {
       output += '&';
     }
 
+    let tag = null;
     if (this.tags) {
-      const tag = this.tags.findTag(sym.tagid);
+      tag = this.tags.findTag(sym.tagid);
       if (tag && tag.name !== '_') {
         output += tag.name + ':';
       }
@@ -205,7 +206,12 @@ export class SmxLegacyDebugSymbolTable extends SmxSection {
         }
       }
       if (dim.size > 0) {
-        output += dim.size;
+        // Last dimension of a string array is in bytes not in cells.
+        if (d === sym.dimcount - 1 && tag != null && tag.name === 'String') {
+          output += dim.size * 4;
+        } else {
+          output += dim.size;
+        }
       }
       output += ']';
     }

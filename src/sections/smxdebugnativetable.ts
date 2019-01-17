@@ -83,8 +83,9 @@ export class SmxDebugNativeTable extends SmxSection {
         signature += '&';
       }
 
+      let argTag = null;
       if (this.tags) {
-        const argTag = this.tags.findTag(arg.tagid);
+        argTag = this.tags.findTag(arg.tagid);
         if (argTag != null && argTag.name !== '_') {
           signature += argTag.name + ':';
         }
@@ -95,7 +96,7 @@ export class SmxDebugNativeTable extends SmxSection {
       } else {
         signature += arg.name;
       }
-      
+
       for (let d = 0; d < arg.dimcount; d++) {
         const dim = arg.dims[d];
         signature += '[';
@@ -106,7 +107,12 @@ export class SmxDebugNativeTable extends SmxSection {
           }
         }
         if (dim.size > 0) {
-          signature += dim.size;
+          // Last dimension of a string array is in bytes not in cells.
+          if (d === arg.dimcount - 1 && argTag != null && argTag.name === 'String') {
+            signature += dim.size * 4;
+          } else {
+            signature += dim.size;
+          }
         }
         signature += ']';
       }

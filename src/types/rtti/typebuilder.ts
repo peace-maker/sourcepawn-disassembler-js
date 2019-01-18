@@ -56,11 +56,8 @@ export class TypeBuilder {
       argv[i] = text;
     }
 
-    let signature = 'function' + returnType + ' (' + argv.join(', ');
+    let signature = 'function ' + returnType + ' (' + argv.join(', ');
     if (variadic) {
-      if (argc > 0) {
-        signature += ', ';
-      }
       signature += '...';
     }
     signature += ')';
@@ -85,9 +82,7 @@ export class TypeBuilder {
       case TypeFlag.TopFunction:
         return 'Function';
       case TypeFlag.FixedArray: {
-        const view = new DataView(this.bytes, this.offset);
-        const index = view.getUint32(0, true);
-        this.offset += 4;
+        const index = this.decodeUint32();
         const inner = this.decode();
         return inner + '[' + index + ']';
       }
@@ -96,35 +91,25 @@ export class TypeBuilder {
         return inner + '[]';
       }
       case TypeFlag.Enum: {
-        const view = new DataView(this.bytes, this.offset);
-        const index = view.getUint32(0, true);
-        this.offset += 4;
+        const index = this.decodeUint32();
         return this.smxFile.rttiEnums.enums[index].name;
       }
       case TypeFlag.Typedef: {
-        const view = new DataView(this.bytes, this.offset);
-        const index = view.getUint32(0, true);
-        this.offset += 4;
+        const index = this.decodeUint32();
         return this.smxFile.rttiTypedefs.typedefs[index].name;
       }
       case TypeFlag.Typeset: {
-        const view = new DataView(this.bytes, this.offset);
-        const index = view.getUint32(0, true);
-        this.offset += 4;
+        const index = this.decodeUint32();
         return this.smxFile.rttiTypesets.typesets[index].name;
       }
       case TypeFlag.Struct: {
-        const view = new DataView(this.bytes, this.offset);
-        const index = view.getUint32(0, true);
-        this.offset += 4;
+        const index = this.decodeUint32();
         return this.smxFile.rttiClassDefs.classdefs[index].name;
       }
       case TypeFlag.Function:
         return this.decodeFunction();
       case TypeFlag.EnumStruct: {
-        const view = new DataView(this.bytes, this.offset);
-        const index = view.getUint32(0, true);
-        this.offset += 4;
+        const index = this.decodeUint32();
         return this.smxFile.rttiEnumStructs.entries[index].name;
       }
     }
@@ -137,5 +122,19 @@ export class TypeBuilder {
     }
     this.offset++;
     return true;
+  }
+
+  private decodeUint32(): number {
+    let value = 0;
+    let shift = 0;
+    while (true) {
+      const b = this.bytes[this.offset++];
+      value |= (b & 0x7f) << shift;
+      if ((b & 0x80) === 0) {
+        break;
+      }
+      shift += 7;
+    }
+    return value;
   }
 }

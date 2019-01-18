@@ -42,6 +42,7 @@ export class SmxRttiDataSection extends SmxSection {
   }
 
   public typesetTypesFromOffset(offset: number): string[] {
+    // FIXME: Use TypeBuilder.decodeUint32()
     const view = new DataView(this.bytes, offset);
     const count = view.getUint32(0, true);
     const types = [];

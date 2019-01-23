@@ -64,6 +64,16 @@ export class TypeBuilder {
     return signature;
   }
 
+  public decodeTypeset(): string[] {
+    const count = this.decodeUint32();
+    const types = [];
+
+    for (let i = 0; i < count; i++) {
+      types[i] = this.decodeNew();
+    }
+    return types;
+  }
+
   private decode(): string {
     this.isConst = this.match(TypeFlag.Const) || this.isConst;
 

@@ -27,7 +27,7 @@ import { SmxNativeTable } from './sections/smxnativetable';
 import { SmxPublicTable } from './sections/smxpublictable';
 import { SmxPubvarTable } from './sections/smxpubvartable';
 import { SmxTagTable } from './sections/smxtagtable';
-import { RttiFieldEntry, RttiEnumStructFieldEntry } from './types';
+import { RttiEnumStructFieldEntry, RttiFieldEntry } from './types';
 import { SymKind } from './types/symkind';
 
 export class SourcePawnFile {
@@ -251,6 +251,7 @@ export class SourcePawnFile {
     for (const section of this.header.sections) {
       switch (section.name) {
         case '.names':
+        case '.tags':
         case '.dbg.strings':
         case '.dbg.info':
           break;
@@ -317,7 +318,7 @@ export class SourcePawnFile {
         case 'rtti.typedefs':
           this.rttiTypedefs = new SmxRttiTypedefTable(this.header, section, this.names);
           break;
-        case 'rtti.typedefs':
+        case 'rtti.typesets':
           this.rttiTypesets = new SmxRttiTypesetTable(this.header, section, this.names);
           break;
         default:

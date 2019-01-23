@@ -1,7 +1,7 @@
 import { inflateRaw } from 'pako';
 import { SectionEntry } from './sectionentry';
 
-enum CompressionType {
+export enum CompressionType {
   None = 0,
   Gz = 1,
 }
@@ -56,7 +56,7 @@ export class FileHeader {
   public disksize: number;
   public imagesize: number;
 
-  // Number of named file secctions.
+  // Number of named file sections.
   public numSections: number;
 
   // Offset to the string table. Each string is null-terminated. The string

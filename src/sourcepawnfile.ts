@@ -28,6 +28,7 @@ import { SmxPublicTable } from './sections/smxpublictable';
 import { SmxPubvarTable } from './sections/smxpubvartable';
 import { SmxTagTable } from './sections/smxtagtable';
 import { SymKind } from './types/symkind';
+import { RttiClassDefEntry, RttiFieldEntry } from './types';
 
 export class SourcePawnFile {
   public header!: FileHeader;
@@ -170,6 +171,28 @@ export class SourcePawnFile {
       }
     }
     return false;
+  }
+
+  public getFieldsOfClassDef(classDefIndex: number): RttiFieldEntry[] {
+    if (!this.rttiClassDefs || !this.rttiFields) {
+      return [];
+    }
+    
+    // Make sure a class definition exists at that index.
+    if (classDefIndex < 0 || classDefIndex >= this.rttiClassDefs.classdefs.length) {
+      return [];
+    }
+
+    const classdef = this.rttiClassDefs.classdefs[classDefIndex];
+    const fields = [];
+    // All fields starting from the firstField index belong to the classdef up until
+    // the next classdef starts or the end, if there are no more classdefs after.
+    let stopat = this.rttiFields.fields.length;
+    if (classDefIndex < this.rttiClassDefs.classdefs.length - 1) {
+      stopat = this.rttiClassDefs.classdefs[classDefIndex + 1].firstField;
+    }
+    
+    return this.rttiFields.fields.slice(classdef.firstField, stopat);
   }
 
   private OnFileLoaded(data: ArrayBuffer): any {

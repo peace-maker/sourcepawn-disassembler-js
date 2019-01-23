@@ -5,7 +5,7 @@ export class RttiEnumStructFieldEntry {
   public nameoffs!: number;
 
   // Encoded type id.
-  public typeId!: number;
+  public typeid!: number;
 
   // Offset in the struct (array like).
   public offset!: number;

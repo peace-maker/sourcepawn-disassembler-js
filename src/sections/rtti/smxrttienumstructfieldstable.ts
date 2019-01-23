@@ -15,7 +15,7 @@ export class SmxRttiEnumStructFieldTable extends SmxRttiListTable {
     for (let i = 0; i < this.rowcount; i++) {
       const entry = new RttiEnumStructFieldEntry();
       entry.nameoffs = view.getUint32(i * this.rowsize + 0, true);
-      entry.typeId = view.getUint32(i * this.rowsize + 4, true);
+      entry.typeid = view.getUint32(i * this.rowsize + 4, true);
       entry.offset = view.getUint32(i * this.rowsize + 8, true);
       entry.name = names.stringAt(entry.nameoffs);
       this.entries[i] = entry;

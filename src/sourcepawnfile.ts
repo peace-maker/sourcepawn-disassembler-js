@@ -27,7 +27,7 @@ import { SmxNativeTable } from './sections/smxnativetable';
 import { SmxPublicTable } from './sections/smxpublictable';
 import { SmxPubvarTable } from './sections/smxpubvartable';
 import { SmxTagTable } from './sections/smxtagtable';
-import { RttiFieldEntry } from './types';
+import { RttiFieldEntry, RttiEnumStructFieldEntry } from './types';
 import { SymKind } from './types/symkind';
 
 export class SourcePawnFile {
@@ -192,6 +192,26 @@ export class SourcePawnFile {
     }
     
     return this.rttiFields.fields.slice(classdef.firstField, stopat);
+  }
+
+  public getFieldsOfEnumStruct(enumStructIndex: number): RttiEnumStructFieldEntry[] {
+    if (!this.rttiEnumStructs || !this.rttiEnumStructFields) {
+      return [];
+    }
+
+    if (enumStructIndex < 0 || enumStructIndex >= this.rttiEnumStructs.entries.length) {
+      return [];
+    }
+
+    const enumStruct = this.rttiEnumStructs.entries[enumStructIndex];
+    // All fields starting from the firstField index belong to the enumstruct up until
+    // the next enumstruct starts or the end, if there are no more enumstructs after.
+    let stopat = this.rttiEnumStructFields.entries.length;
+    if (enumStructIndex < this.rttiEnumStructs.entries.length - 1) {
+      stopat = this.rttiEnumStructs.entries[enumStructIndex + 1].firstField;
+    }
+
+    return this.rttiEnumStructFields.entries.slice(enumStruct.firstField, stopat);
   }
 
   private OnFileLoaded(data: ArrayBuffer): any {

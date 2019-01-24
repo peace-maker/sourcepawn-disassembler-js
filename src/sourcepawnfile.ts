@@ -177,7 +177,7 @@ export class SourcePawnFile {
     if (!this.rttiClassDefs || !this.rttiFields) {
       return [];
     }
-    
+
     // Make sure a class definition exists at that index.
     if (classDefIndex < 0 || classDefIndex >= this.rttiClassDefs.classdefs.length) {
       return [];
@@ -190,7 +190,7 @@ export class SourcePawnFile {
     if (classDefIndex < this.rttiClassDefs.classdefs.length - 1) {
       stopat = this.rttiClassDefs.classdefs[classDefIndex + 1].firstField;
     }
-    
+
     return this.rttiFields.fields.slice(classdef.firstField, stopat);
   }
 
@@ -280,7 +280,13 @@ export class SourcePawnFile {
           this.debugNatives = new SmxDebugNativeTable(this.header, section, this.debugNames, this.tags);
           break;
         case '.dbg.symbols':
-          this.debugSymbols = new SmxLegacyDebugSymbolTable(this.header, section, this.debugInfo, this.debugNames, this.tags);
+          this.debugSymbols = new SmxLegacyDebugSymbolTable(
+            this.header,
+            section,
+            this.debugInfo,
+            this.debugNames,
+            this.tags,
+          );
           break;
         case '.dbg.methods':
           this.debugMethods = new SmxDebugMethodTable(this.header, section);

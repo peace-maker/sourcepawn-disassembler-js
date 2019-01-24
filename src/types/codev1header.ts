@@ -5,7 +5,7 @@ export enum CodeV1Flags {
 export enum CodeV1Features {
   // This feature adds the REBASE opcode, and requires that multi-dimensional
   // arrays use direct internal addressing.
-  DirectArrays = (1 << 0),
+  DirectArrays = 1 << 0,
 }
 
 export class CodeV1Header {

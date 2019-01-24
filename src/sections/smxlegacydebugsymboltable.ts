@@ -16,7 +16,13 @@ export class SmxLegacyDebugSymbolTable extends SmxSection {
   private globalVariables: DebugSymbolEntry[];
   private tags: SmxTagTable;
 
-  public constructor(file: FileHeader, section: SectionEntry, info: SmxDebugInfoSection, names: SmxNameTable, tags: SmxTagTable) {
+  public constructor(
+    file: FileHeader,
+    section: SectionEntry,
+    info: SmxDebugInfoSection,
+    names: SmxNameTable,
+    tags: SmxTagTable,
+  ) {
     super(file, section);
 
     this.tags = tags;
@@ -195,7 +201,7 @@ export class SmxLegacyDebugSymbolTable extends SmxSection {
     }
 
     output += sym.name;
-    
+
     for (let d = 0; d < sym.dimcount; d++) {
       const dim = sym.dims[d];
       output += '[';

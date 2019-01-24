@@ -1,4 +1,4 @@
-import { SourcePawnFile} from '../sourcepawnfile';
+import { SourcePawnFile } from '../sourcepawnfile';
 import { V1Instruction } from './v1instruction';
 import { V1Opcode } from './v1opcode';
 import { V1OpcodeInfo } from './v1opcodeinfo';

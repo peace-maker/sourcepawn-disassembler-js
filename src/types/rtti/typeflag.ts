@@ -13,7 +13,7 @@ export enum TypeFlag {
   Enum = 0x42,
   Typedef = 0x43,
   Typeset = 0x44,
-  Struct = 0x45,
+  Classdef = 0x45,
   EnumStruct = 0x46,
 
   Void = 0x70,

@@ -92,9 +92,9 @@ export class TypeBuilder {
       case TypeFlag.TopFunction:
         return 'Function';
       case TypeFlag.FixedArray: {
-        const index = this.decodeUint32();
+        const size = this.decodeUint32();
         const inner = this.decode();
-        return inner + '[' + index + ']';
+        return inner + '[' + size + ']';
       }
       case TypeFlag.Array: {
         const inner = this.decode();
@@ -112,7 +112,7 @@ export class TypeBuilder {
         const index = this.decodeUint32();
         return this.smxFile.rttiTypesets.typesets[index].name;
       }
-      case TypeFlag.Struct: {
+      case TypeFlag.Classdef: {
         const index = this.decodeUint32();
         return this.smxFile.rttiClassDefs.classdefs[index].name;
       }

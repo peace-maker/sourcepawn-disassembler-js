@@ -1,5 +1,12 @@
+export enum ClassDefFlagsType {
+  Struct = 0x0
+}
+
 export class RttiClassDefEntry {
   public static readonly Size: number = 28;
+
+  // Bits 0-1 of the flags indicate the definition type.
+  public static readonly TypeMask = 0x3;
 
   public flags!: number;
 

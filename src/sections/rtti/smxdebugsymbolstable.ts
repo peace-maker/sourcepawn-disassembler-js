@@ -16,7 +16,7 @@ export class SmxDebugSymbolsTable extends SmxRttiListTable {
     let offset = 0;
     for (let i = 0; i < this.rowcount; i++) {
       const entry = new DebugVarEntry();
-      entry.address = view.getUint32(offset + 0, true);
+      entry.address = view.getInt32(offset + 0, true);
       entry.scope = view.getUint8(offset + 4) & 3;
       entry.nameoffs = view.getUint32(offset + 5, true);
       entry.codestart = view.getUint32(offset + 9, true);

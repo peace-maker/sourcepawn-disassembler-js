@@ -1,6 +1,7 @@
 import { FileHeader } from '../../fileheader';
 import { SectionEntry } from '../../sectionentry';
 import { SourcePawnFile } from '../../sourcepawnfile';
+import { RttiType } from '../../types';
 import { TypeBuilder } from '../../types/rtti/typebuilder';
 import { TypeId } from '../../types/rtti/typeid';
 import { SmxSection } from '../smxsection';
@@ -16,7 +17,7 @@ export class SmxRttiDataSection extends SmxSection {
     this.bytes = new Uint8Array(file.sectionReader(section));
   }
 
-  public typeFromTypeId(typeId: number): string {
+  public typeFromTypeId(typeId: number): RttiType {
     const kind = typeId & 0xf;
     const payload = (typeId >> 4) & 0xfffffff;
 
@@ -33,23 +34,17 @@ export class SmxRttiDataSection extends SmxSection {
     if (kind !== TypeId.Complex) {
       throw new Error('Unknown type id kind: ' + kind);
     }
-    return this.buildTypename(payload);
+    const b = new TypeBuilder(this.smxFile, this.bytes, payload);
+    return b.decodeNew();
   }
 
-  public functionTypeFromOffset(offset: number): string {
+  public functionTypeFromOffset(offset: number): RttiType {
     const tb = new TypeBuilder(this.smxFile, this.bytes, offset);
     return tb.decodeFunction();
   }
 
-  public typesetTypesFromOffset(offset: number): string[] {
+  public typesetTypesFromOffset(offset: number): RttiType {
     const tb = new TypeBuilder(this.smxFile, this.bytes, offset);
     return tb.decodeTypeset();
-  }
-
-  private buildTypename(offset: number): string {
-    const b = new TypeBuilder(this.smxFile, this.bytes, offset);
-    const text = b.decodeNew();
-    offset = b.offset;
-    return text;
   }
 }

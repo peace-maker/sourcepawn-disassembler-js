@@ -1,5 +1,5 @@
 export enum ClassDefFlagsType {
-  Struct = 0x0
+  Struct = 0x0,
 }
 
 export class RttiClassDefEntry {

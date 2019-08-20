@@ -220,7 +220,7 @@ export class V1Disassembler {
           const label = this.readNext();
           caseInsn.params[0] = defval;
           caseInsn.params[1] = label;
-          
+
           // Still add the case info to the casetbl,
           // since technically they are just parameters for that opcode.
           insn.params[2 + i * 2] = defval;

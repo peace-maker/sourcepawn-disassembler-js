@@ -1,4 +1,5 @@
 import { SourcePawnFile } from '../../sourcepawnfile';
+import { RttiType } from './rttitype';
 import { TypeFlag } from './typeflag';
 
 export class TypeBuilder {
@@ -16,112 +17,111 @@ export class TypeBuilder {
 
   // Decode a type, but reset the |is_const| indicator for non-
   // dependent type.
-  public decodeNew(): string {
+  public decodeNew(): RttiType {
     const wasConst = this.isConst;
     this.isConst = false;
 
-    let result = this.decode();
+    const result = this.decode();
     if (this.isConst) {
-      result = 'const ' + result;
+      result.setConst();
     }
 
     this.isConst = wasConst;
     return result;
   }
 
-  public decodeFunction(): string {
+  public decodeFunction(): RttiType {
     const argc = this.bytes[this.offset++];
 
-    let variadic = false;
+    const func = new RttiType(TypeFlag.Function);
     if (this.bytes[this.offset] === TypeFlag.Variadic) {
-      variadic = true;
+      func.setVariadic();
       this.offset++;
     }
 
-    let returnType = '';
     if (this.bytes[this.offset] === TypeFlag.Void) {
-      returnType = 'void';
+      func.setInnerType(new RttiType(TypeFlag.Void));
       this.offset++;
     } else {
-      returnType = this.decodeNew();
+      func.setInnerType(this.decodeNew());
     }
 
-    const argv = [];
     for (let i = 0; i < argc; i++) {
       const isByRef = this.match(TypeFlag.ByRef);
-      let text = this.decodeNew();
+      const arg = this.decodeNew();
       if (isByRef) {
-        text += '&';
+        arg.setByRef();
       }
-      argv[i] = text;
+      func.addArgument(arg);
     }
-
-    let signature = 'function ' + returnType + ' (' + argv.join(', ');
-    if (variadic) {
-      signature += '...';
-    }
-    signature += ')';
-    return signature;
+    return func;
   }
 
-  public decodeTypeset(): string[] {
+  public decodeTypeset(): RttiType {
+    const typeset = new RttiType(TypeFlag.Typeset);
     const count = this.decodeUint32();
-    const types = [];
 
     for (let i = 0; i < count; i++) {
-      types[i] = this.decodeNew();
+      typeset.addArgument(this.decodeNew());
     }
-    return types;
+    return typeset;
   }
 
-  private decode(): string {
+  private decode(): RttiType {
     this.isConst = this.match(TypeFlag.Const) || this.isConst;
 
     const b = this.bytes[this.offset++];
     switch (b) {
       case TypeFlag.Bool:
-        return 'bool';
       case TypeFlag.Int32:
-        return 'int';
       case TypeFlag.Float32:
-        return 'float';
       case TypeFlag.Char8:
-        return 'char';
       case TypeFlag.Any:
-        return 'any';
       case TypeFlag.TopFunction:
-        return 'Function';
+        return new RttiType(b);
       case TypeFlag.FixedArray: {
-        const size = this.decodeUint32();
-        const inner = this.decode();
-        return inner + '[' + size + ']';
+        const type = new RttiType(b);
+        type.setIndex(this.decodeUint32());
+        type.setInnerType(this.decode());
+        return type;
       }
       case TypeFlag.Array: {
-        const inner = this.decode();
-        return inner + '[]';
+        const type = new RttiType(b);
+        type.setInnerType(this.decode());
+        return type;
       }
       case TypeFlag.Enum: {
-        const index = this.decodeUint32();
-        return this.smxFile.rttiEnums.enums[index].name;
+        const type = new RttiType(b);
+        type.setIndex(this.decodeUint32());
+        type.setRttiEntry(this.smxFile.rttiEnums.enums[type.index]);
+        return type;
       }
       case TypeFlag.Typedef: {
-        const index = this.decodeUint32();
-        return this.smxFile.rttiTypedefs.typedefs[index].name;
+        const type = new RttiType(b);
+        type.setIndex(this.decodeUint32());
+        type.setRttiEntry(this.smxFile.rttiTypedefs.typedefs[type.index]);
+        return type;
       }
       case TypeFlag.Typeset: {
-        const index = this.decodeUint32();
-        return this.smxFile.rttiTypesets.typesets[index].name;
+        const type = new RttiType(b);
+        type.setIndex(this.decodeUint32());
+        type.setRttiEntry(this.smxFile.rttiTypesets.typesets[type.index]);
+        return type;
       }
       case TypeFlag.Classdef: {
-        const index = this.decodeUint32();
-        return this.smxFile.rttiClassDefs.classdefs[index].name;
+        const type = new RttiType(b);
+        type.setIndex(this.decodeUint32());
+        type.setRttiEntry(this.smxFile.rttiClassDefs.classdefs[type.index]);
+        return type;
+      }
+      case TypeFlag.EnumStruct: {
+        const type = new RttiType(b);
+        type.setIndex(this.decodeUint32());
+        type.setRttiEntry(this.smxFile.rttiEnumStructs.entries[type.index]);
+        return type;
       }
       case TypeFlag.Function:
         return this.decodeFunction();
-      case TypeFlag.EnumStruct: {
-        const index = this.decodeUint32();
-        return this.smxFile.rttiEnumStructs.entries[index].name;
-      }
     }
     throw new Error('unknown type code: ' + b);
   }

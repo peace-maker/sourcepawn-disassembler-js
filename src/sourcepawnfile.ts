@@ -231,9 +231,13 @@ export class SourcePawnFile {
 
     // Catch the tags section first.
     for (const section of this.header.sections) {
-      if (section.name === '.tags') {
-        this.tags = new SmxTagTable(this.header, section, this.names);
-        break;
+      switch (section.name) {
+        case '.tags':
+          this.tags = new SmxTagTable(this.header, section, this.names);
+          break;
+        case '.dbg.locals':
+          this.debugLocals = new SmxDebugLocalsTable(this, this.header, section, this.names);
+          break;
       }
     }
 
@@ -254,6 +258,7 @@ export class SourcePawnFile {
         case '.tags':
         case '.dbg.strings':
         case '.dbg.info':
+        case '.dbg.locals':
           break;
         case '.natives':
           this.natives = new SmxNativeTable(this.header, section, this.names);
@@ -289,13 +294,10 @@ export class SourcePawnFile {
           );
           break;
         case '.dbg.methods':
-          this.debugMethods = new SmxDebugMethodTable(this.header, section);
+          this.debugMethods = new SmxDebugMethodTable(this.header, section, this.debugLocals);
           break;
         case '.dbg.globals':
           this.debugGlobals = new SmxDebugGlobalsTable(this.header, section, this.names);
-          break;
-        case '.dbg.locals':
-          this.debugLocals = new SmxDebugLocalsTable(this, this.header, section, this.names);
           break;
         case 'rtti.data':
           this.rttiData = new SmxRttiDataSection(this, this.header, section);

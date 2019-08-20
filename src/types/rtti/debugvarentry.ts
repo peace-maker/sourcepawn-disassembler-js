@@ -18,7 +18,7 @@ export class DebugVarEntry {
   // Live in region < codeend.
   public codeend!: number;
 
-  // Offset into .rtti.typedefs table.
+  // Offset into .rtti.data section.
   public typeid!: number;
 
   // Computed name.

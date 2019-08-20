@@ -34,14 +34,14 @@
   },
   "homepage": "https://github.com/peace-maker/sourcepawn-disassembler-js#readme",
   "devDependencies": {
-    "@types/node": "^10.12.18",
-    "@types/pako": "^1.0.0",
-    "prettier": "^1.16.1",
-    "tslint": "^5.12.1",
-    "tslint-config-prettier": "^1.17.0",
-    "typescript": "^3.2.4"
+    "@types/node": "^10.14.15",
+    "@types/pako": "^1.0.1",
+    "prettier": "^1.18.2",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.5.3"
   },
   "dependencies": {
-    "pako": "^1.0.8"
+    "pako": "^1.0.10"
   }
 }

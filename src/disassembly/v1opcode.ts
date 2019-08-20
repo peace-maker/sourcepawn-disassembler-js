@@ -186,4 +186,6 @@ export enum V1Opcode {
   FLOAT_NE,
   FLOAT_EQ,
   FLOAT_NOT,
+  // Pseudo Opcode for easier CASETBL handling.
+  CASE = 255,
 }

@@ -5,5 +5,4 @@ export enum V1Param {
   Function,
   Native,
   Address,
-  CaseTable,
 }

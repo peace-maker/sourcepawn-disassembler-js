@@ -29,7 +29,7 @@ export class V1Disassembler {
     this.prepareOpcode(V1Opcode.BOUNDS, V1Param.Constant);
     this.prepareOpcode(V1Opcode.BREAK);
     this.prepareOpcode(V1Opcode.CALL, V1Param.Function);
-    this.prepareOpcode(V1Opcode.CASETBL, V1Param.CaseTable);
+    this.prepareOpcode(V1Opcode.CASETBL, V1Param.Constant, V1Param.Jump);
     this.prepareOpcode(V1Opcode.CONST, V1Param.Address, V1Param.Constant);
     this.prepareOpcode(V1Opcode.CONST_ALT, V1Param.Constant);
     this.prepareOpcode(V1Opcode.CONST_PRI, V1Param.Constant);
@@ -153,7 +153,7 @@ export class V1Disassembler {
     this.prepareOpcode(V1Opcode.SUB_ALT);
     this.prepareOpcode(V1Opcode.SWAP_ALT);
     this.prepareOpcode(V1Opcode.SWAP_PRI);
-    this.prepareOpcode(V1Opcode.SWITCH, V1Param.CaseTable);
+    this.prepareOpcode(V1Opcode.SWITCH, V1Param.Jump);
     this.prepareOpcode(V1Opcode.SYSREQ_C, V1Param.Native);
     this.prepareOpcode(V1Opcode.SYSREQ_N, V1Param.Native, V1Param.Constant);
     this.prepareOpcode(V1Opcode.TRACKER_POP_SETHEAP);
@@ -165,6 +165,7 @@ export class V1Disassembler {
     this.prepareOpcode(V1Opcode.ZERO_PRI);
     this.prepareOpcode(V1Opcode.ZERO_S, V1Param.Stack);
     this.prepareOpcode(V1Opcode.REBASE, V1Param.Address, V1Param.Constant, V1Param.Constant);
+    this.prepareOpcode(V1Opcode.CASE, V1Param.Constant, V1Param.Jump);
   }
 
   private smxFile: SourcePawnFile;
@@ -208,9 +209,22 @@ export class V1Disassembler {
         const ncases = this.readNext();
         insn.params[0] = ncases;
         insn.params[1] = this.readNext();
+
+        // Add seperate pseudo instructions for all case entries in the table.
         for (let i = 0; i < ncases; i++) {
-          insn.params[2 + i * 2] = this.readNext();
-          insn.params[2 + i * 2 + 1] = this.readNext();
+          const caseAddr = this.cursor;
+          const caseInsn = new V1Instruction(caseAddr, V1Disassembler.opcodeList[V1Opcode.CASE.valueOf()]);
+          insns.push(caseInsn);
+
+          const defval = this.readNext();
+          const label = this.readNext();
+          caseInsn.params[0] = defval;
+          caseInsn.params[1] = label;
+          
+          // Still add the case info to the casetbl,
+          // since technically they are just parameters for that opcode.
+          insn.params[2 + i * 2] = defval;
+          insn.params[2 + i * 2 + 1] = label;
         }
         continue;
       }

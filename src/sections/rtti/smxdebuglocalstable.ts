@@ -1,6 +1,7 @@
 import { FileHeader } from '../../fileheader';
 import { SectionEntry } from '../../sectionentry';
 import { SourcePawnFile } from '../../sourcepawnfile';
+import { TypeFlag } from '../../types';
 import { DebugVarEntry } from '../../types/rtti/debugvarentry';
 import { SmxNameTable } from '../smxnametable';
 import { SmxDebugSymbolsTable } from './smxdebugsymbolstable';
@@ -62,5 +63,20 @@ export class SmxDebugLocalsTable extends SmxDebugSymbolsTable {
     }
 
     return null;
+  }
+
+  public renderDeclaration(entry: DebugVarEntry): string {
+    let content = '';
+    const type = this.smxFile.rttiData.typeFromTypeId(entry.typeid);
+    content = '' + type;
+
+    // Fix array declarations. Fixed array dimensions appear after the variable name.
+    if (type.type === TypeFlag.Array) {
+      content += entry.name;
+    } else if (type.type === TypeFlag.FixedArray) {
+      const dimsStart = content.indexOf('[');
+      content = content.slice(0, dimsStart) + entry.name + content.slice(dimsStart);
+    }
+    return content;
   }
 }

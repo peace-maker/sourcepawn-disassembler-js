@@ -214,7 +214,7 @@ export class V1Disassembler {
 
     const procInsn = new V1Instruction(startAddress, V1Disassembler.opcodeList[procOp.valueOf()]);
     procInsn.bytes = this.data.buffer.slice(this.codeStart + startAddress, this.codeStart + this.cursor);
-    
+
     const insns = [procInsn];
     while (this.cursor < this.cursorLimit) {
       const address = this.cursor;

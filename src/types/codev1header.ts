@@ -8,7 +8,7 @@ export enum CodeV1Features {
   // arrays use direct internal addressing.
   DirectArrays = 1 << 1,
   // This feature adds the HEAP_SAVE and HEAP_RESTORE opcodes.
-  HeapScopes = 1 << 2
+  HeapScopes = 1 << 2,
 }
 
 export class CodeV1Header {

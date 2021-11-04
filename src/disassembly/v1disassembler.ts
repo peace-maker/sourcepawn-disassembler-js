@@ -227,6 +227,7 @@ export class V1Disassembler {
         const ncases = this.readNext();
         insn.params[0] = ncases;
         insn.params[1] = this.readNext();
+        insn.bytes = this.data.buffer.slice(this.codeStart + address, this.codeStart + this.cursor);
 
         // Add seperate pseudo instructions for all case entries in the table.
         for (let i = 0; i < ncases; i++) {
@@ -238,6 +239,7 @@ export class V1Disassembler {
           const label = this.readNext();
           caseInsn.params[0] = defval;
           caseInsn.params[1] = label;
+          caseInsn.bytes = this.data.buffer.slice(this.codeStart + caseAddr, this.codeStart + this.cursor);
 
           // Still add the case info to the casetbl,
           // since technically they are just parameters for that opcode.
@@ -251,6 +253,8 @@ export class V1Disassembler {
       for (let i = 0; i < insn.info.params.length; i++) {
         insn.params[i] = this.readNext();
       }
+
+      insn.bytes = this.data.buffer.slice(this.codeStart + address, this.codeStart + this.cursor);
 
       if (op === V1Opcode.CALL) {
         const addr = insn.params[0];

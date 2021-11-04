@@ -165,6 +165,24 @@ export class V1Disassembler {
     this.prepareOpcode(V1Opcode.ZERO_PRI);
     this.prepareOpcode(V1Opcode.ZERO_S, V1Param.Stack);
     this.prepareOpcode(V1Opcode.REBASE, V1Param.Address, V1Param.Constant, V1Param.Constant);
+    this.prepareOpcode(
+      V1Opcode.INITARRAY_PRI,
+      V1Param.Address,
+      V1Param.Constant,
+      V1Param.Constant,
+      V1Param.Constant,
+      V1Param.Constant,
+    );
+    this.prepareOpcode(
+      V1Opcode.INITARRAY_ALT,
+      V1Param.Address,
+      V1Param.Constant,
+      V1Param.Constant,
+      V1Param.Constant,
+      V1Param.Constant,
+    );
+    this.prepareOpcode(V1Opcode.HEAP_SAVE);
+    this.prepareOpcode(V1Opcode.HEAP_RESTORE);
     this.prepareOpcode(V1Opcode.CASE, V1Param.Constant, V1Param.Jump);
   }
 

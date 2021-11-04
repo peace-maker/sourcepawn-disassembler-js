@@ -3,9 +3,12 @@ export enum CodeV1Flags {
 }
 
 export enum CodeV1Features {
-  // This feature adds the REBASE opcode, and requires that multi-dimensional
+  Deprecated0 = 1 << 0,
+  // This feature adds the INIT_ARRAY opcode, and requires that multi-dimensional
   // arrays use direct internal addressing.
-  DirectArrays = 1 << 0,
+  DirectArrays = 1 << 1,
+  // This feature adds the HEAP_SAVE and HEAP_RESTORE opcodes.
+  HeapScopes = 1 << 2
 }
 
 export class CodeV1Header {
@@ -34,5 +37,5 @@ export class CodeV1Header {
   public codeoffs!: number;
 
   // Feature set.
-  public features!: number;
+  public features!: CodeV1Features;
 }

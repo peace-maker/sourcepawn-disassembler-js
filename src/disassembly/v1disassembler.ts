@@ -66,10 +66,10 @@ export class V1Disassembler {
     this.prepareOpcode(V1Opcode.JZER, V1Param.Jump);
     this.prepareOpcode(V1Opcode.LIDX);
     this.prepareOpcode(V1Opcode.LIDX_B, V1Param.Constant);
-    this.prepareOpcode(V1Opcode.LOAD_ALT, V1Param.Constant);
-    this.prepareOpcode(V1Opcode.LOAD_BOTH, V1Param.Constant, V1Param.Constant);
+    this.prepareOpcode(V1Opcode.LOAD_ALT, V1Param.Address);
+    this.prepareOpcode(V1Opcode.LOAD_BOTH, V1Param.Address, V1Param.Address);
     this.prepareOpcode(V1Opcode.LOAD_I);
-    this.prepareOpcode(V1Opcode.LOAD_PRI, V1Param.Constant);
+    this.prepareOpcode(V1Opcode.LOAD_PRI, V1Param.Address);
     this.prepareOpcode(V1Opcode.LOAD_S_ALT, V1Param.Stack);
     this.prepareOpcode(V1Opcode.LOAD_S_BOTH, V1Param.Stack, V1Param.Stack);
     this.prepareOpcode(V1Opcode.LOAD_S_PRI, V1Param.Stack);
@@ -142,9 +142,9 @@ export class V1Disassembler {
     this.prepareOpcode(V1Opcode.SREF_S_PRI, V1Param.Stack);
     this.prepareOpcode(V1Opcode.SSHR);
     this.prepareOpcode(V1Opcode.STACK, V1Param.Constant);
-    this.prepareOpcode(V1Opcode.STOR_ALT, V1Param.Constant);
+    this.prepareOpcode(V1Opcode.STOR_ALT, V1Param.Address);
     this.prepareOpcode(V1Opcode.STOR_I);
-    this.prepareOpcode(V1Opcode.STOR_PRI, V1Param.Constant);
+    this.prepareOpcode(V1Opcode.STOR_PRI, V1Param.Address);
     this.prepareOpcode(V1Opcode.STOR_S_ALT, V1Param.Stack);
     this.prepareOpcode(V1Opcode.STOR_S_PRI, V1Param.Stack);
     this.prepareOpcode(V1Opcode.STRADJUST_PRI);

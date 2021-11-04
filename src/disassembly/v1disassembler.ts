@@ -39,6 +39,7 @@ export class V1Disassembler {
     this.prepareOpcode(V1Opcode.DEC_I);
     this.prepareOpcode(V1Opcode.DEC_PRI);
     this.prepareOpcode(V1Opcode.DEC_S, V1Param.Stack);
+    this.prepareOpcode(V1Opcode.ENDPROC);
     this.prepareOpcode(V1Opcode.EQ);
     this.prepareOpcode(V1Opcode.EQ_C_ALT, V1Param.Constant);
     this.prepareOpcode(V1Opcode.EQ_C_PRI, V1Param.Constant);
@@ -205,17 +206,21 @@ export class V1Disassembler {
   }
 
   private disassemble(): V1Instruction[] {
+    const startAddress = this.cursor;
     const procOp = this.readNextOp();
     if (procOp !== V1Opcode.PROC) {
       throw new Error(`Function does not start with PROC at ${this.procOffset} (0x${procOp.toString(16)})`);
     }
 
-    const insns = [];
+    const procInsn = new V1Instruction(startAddress, V1Disassembler.opcodeList[procOp.valueOf()]);
+    procInsn.bytes = this.data.buffer.slice(this.codeStart + startAddress, this.codeStart + this.cursor);
+    
+    const insns = [procInsn];
     while (this.cursor < this.cursorLimit) {
       const address = this.cursor;
       const op = this.readNextOp();
-      // Reached the end of the function.
-      if (op === V1Opcode.PROC || op === V1Opcode.ENDPROC) {
+      // Reached the start of the next function.
+      if (op === V1Opcode.PROC) {
         break;
       }
 
@@ -261,6 +266,11 @@ export class V1Disassembler {
         if (!this.smxFile.functionExists(addr)) {
           this.smxFile.calledFunctions.addFunction(addr);
         }
+      }
+
+      // Reached the end of the function.
+      if (op === V1Opcode.ENDPROC) {
+        break;
       }
     }
     return insns;

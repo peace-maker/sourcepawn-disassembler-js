@@ -75,7 +75,7 @@ export class SmxDebugLocalsTable extends SmxDebugSymbolsTable {
       content += entry.name;
     } else if (type.type === TypeFlag.FixedArray) {
       const dimsStart = content.indexOf('[');
-      content = content.slice(0, dimsStart) + entry.name + content.slice(dimsStart);
+      content = content.slice(0, dimsStart) + ' ' + entry.name + content.slice(dimsStart);
     }
     return content;
   }

@@ -47,8 +47,12 @@ export class TypeBuilder {
     }
 
     for (let i = 0; i < argc; i++) {
+      const isConst = this.match(TypeFlag.Const);
       const isByRef = this.match(TypeFlag.ByRef);
       const arg = this.decodeNew();
+      if (isConst) {
+        arg.setConst();
+      }
       if (isByRef) {
         arg.setByRef();
       }
@@ -69,7 +73,9 @@ export class TypeBuilder {
 
   private decode(): RttiType {
     this.isConst = this.match(TypeFlag.Const) || this.isConst;
+    const isByRef = this.match(TypeFlag.ByRef);
 
+    let type: RttiType;
     const b = this.bytes[this.offset++];
     switch (b) {
       case TypeFlag.Bool:
@@ -77,53 +83,63 @@ export class TypeBuilder {
       case TypeFlag.Float32:
       case TypeFlag.Char8:
       case TypeFlag.Any:
-      case TypeFlag.TopFunction:
-        return new RttiType(b);
+      case TypeFlag.TopFunction: {
+        type = new RttiType(b);
+        break;
+      }
       case TypeFlag.FixedArray: {
-        const type = new RttiType(b);
+        type = new RttiType(b);
         type.setIndex(this.decodeUint32());
         type.setInnerType(this.decode());
-        return type;
+        break;
       }
       case TypeFlag.Array: {
-        const type = new RttiType(b);
+        type = new RttiType(b);
         type.setInnerType(this.decode());
-        return type;
+        break;
       }
       case TypeFlag.Enum: {
-        const type = new RttiType(b);
+        type = new RttiType(b);
         type.setIndex(this.decodeUint32());
         type.setRttiEntry(this.smxFile.rttiEnums.enums[type.index]);
-        return type;
+        break;
       }
       case TypeFlag.Typedef: {
-        const type = new RttiType(b);
+        type = new RttiType(b);
         type.setIndex(this.decodeUint32());
         type.setRttiEntry(this.smxFile.rttiTypedefs.typedefs[type.index]);
-        return type;
+        break;
       }
       case TypeFlag.Typeset: {
-        const type = new RttiType(b);
+        type = new RttiType(b);
         type.setIndex(this.decodeUint32());
         type.setRttiEntry(this.smxFile.rttiTypesets.typesets[type.index]);
-        return type;
+        break;
       }
       case TypeFlag.Classdef: {
-        const type = new RttiType(b);
+        type = new RttiType(b);
         type.setIndex(this.decodeUint32());
         type.setRttiEntry(this.smxFile.rttiClassDefs.classdefs[type.index]);
-        return type;
+        break;
       }
       case TypeFlag.EnumStruct: {
-        const type = new RttiType(b);
+        type = new RttiType(b);
         type.setIndex(this.decodeUint32());
         type.setRttiEntry(this.smxFile.rttiEnumStructs.entries[type.index]);
-        return type;
+        break;
       }
-      case TypeFlag.Function:
-        return this.decodeFunction();
+      case TypeFlag.Function: {
+        type = this.decodeFunction();
+        break;
+      }
+      default: {
+        throw new Error('unknown type code: ' + b);
+      }
     }
-    throw new Error('unknown type code: ' + b);
+    if (isByRef) {
+      type.setByRef();
+    }
+    return type;
   }
 
   private match(b: number): boolean {

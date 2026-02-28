@@ -172,6 +172,60 @@ export enum V1Opcode {
   INITARRAY_ALT,
   HEAP_SAVE,
   HEAP_RESTORE,
+
+  /* Identical to 32-bit integer operations, except pri/alt are treated \
+   * as 32-bit IEEE-754 floats. */
+  TEST_F32,
+  NEG_F32,
+  MUL_F32,
+  DIV_ALT_F32,
+  ADD_F32,
+  SUB_ALT_F32,
+  EQ_F32,
+  NEQ_F32,
+  LESS_F32,
+  LEQ_F32,
+  GRTR_F32,
+  GEQ_F32,
+  CVT_F32,
+  MOD_ALT_F32,
+
+  /* The _I64 opcodes assume registers are pointers to at least two cells \
+   * of memory representing an int64. Since the stack and registers are \
+   * not designed to accomodate 64-bit temporaries, some of these opcodes \
+   * take a stack slot parameter. This must be a 64-bit entry in the stack. \
+   * As a convenience, these opcodes set PRI to the address of the given \
+   * stack slot (as if ADDR.PRI were used).
+   */
+  MOVE_I64 = 192,
+  PUSH_I_I64,
+  CVT_I64,
+  TRUNCATE_I64,
+  TEST_I64,
+  INVERT_I64,
+  NEG_I64,
+  SMUL_I64,
+  SDIV_ALT_I64,
+  ADD_I64,
+  SUB_ALT_I64,
+  SHL_I64,
+  SSHR_I64,
+  SHR_I64,
+  EQ_I64,
+  NEQ_I64,
+  OR_I64,
+  AND_I64,
+  XOR_I64,
+  STOR_S_I64_C,
+  SLESS_I64,
+  SLEQ_I64,
+  SGRTR_I64,
+  SGEQ_I64,
+  SMOD_ALT_I64,
+
+  // These opcodes are internal to the compiler and not part of the ABI. They
+  // are used to implement peephole optimizations on legacy float natives. When
+  // kCodeFeatureTypedOps is present, most of these are unused.
   FABS,
   FLOAT,
   FLOATADD,

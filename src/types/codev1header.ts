@@ -9,6 +9,10 @@ export enum CodeV1Features {
   DirectArrays = 1 << 1,
   // This feature adds the HEAP_SAVE and HEAP_RESTORE opcodes.
   HeapScopes = 1 << 2,
+  // This feature indicates that INVALID_FUNCTION is null (0) instead of -1.
+  NullFunctions = 1 << 3,
+  // This feature indicates support for int64 and float ops.
+  TypedOps = 1 << 4,
 }
 
 export class CodeV1Header {

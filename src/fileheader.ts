@@ -1,6 +1,7 @@
 import { inflateRaw } from 'pako';
 import { SectionEntry } from './sectionentry';
 
+// Compression types. Must be 0 for SP_VERSION_2.
 export enum CompressionType {
   None = 0,
   Gz = 1,
@@ -11,16 +12,22 @@ export class FileHeader {
   public readonly FILE_MAGIC: number = 0x53504646;
 
   // File format version number.
+  // 0x0101 - SourcePawn 1.0; initial version used by SourceMod 1.0.
+  // 0x0102 - SourcePawn 1.1; used by SourceMod 1.1+.
+  // 0x0200 - SourcePawn 2.0.
   //
   // The major version bits (8-15) indicate a product number. Consumers
   // should reject any version for a different product.
   //
   // The minor version bits (0-7) indicate a compatibility revision. Any
   // version higher than the current version should be rejected.
-  public readonly SP1_VERSION_1_0: number = 0x0101;
-  public readonly SP1_VERSION_1_1: number = 0x0102;
-  public readonly SP1_VERSION_MIN: number = this.SP1_VERSION_1_0;
-  public readonly SP1_VERSION_MAX: number = this.SP1_VERSION_1_1;
+  public readonly SP_VERSION_1_0: number = 0x0101;
+  public readonly SP_VERSION_1_1: number = 0x0102;
+  public readonly SP_VERSION_1_7: number = 0x0107;
+  public readonly SP_VERSION_1_13: number = 0x0113;
+  public readonly SP_VERSION_2: number = 0x0200;
+  public readonly SP_VERSION_MIN: number = this.SP_VERSION_1_0;
+  public readonly SP_VERSION_MAX: number = this.SP_VERSION_2;
 
   // Size of the header.
   public readonly Size: number = 24;
@@ -76,6 +83,9 @@ export class FileHeader {
 
   public constructor(data: ArrayBuffer) {
     const view = new DataView(data);
+    if (data.byteLength < this.Size) {
+      throw new Error('bad header size');
+    }
     this.magic = view.getUint32(0, true);
     if (this.magic !== this.FILE_MAGIC) {
       throw new Error('invalid file magic value');
@@ -83,31 +93,38 @@ export class FileHeader {
     this.version = view.getUint16(4, true);
     this.compression = view.getUint8(6);
     this.disksize = view.getInt32(7, true);
-    if (this.disksize < this.Size) {
-      throw new Error('invalid disksize');
-    }
     this.imagesize = view.getInt32(11, true);
-    if (this.imagesize < this.disksize) {
-      throw new Error('invalid imagesize');
-    }
     this.numSections = view.getUint8(15);
     this.stringtab = view.getInt32(16, true);
-    if (this.stringtab < this.Size) {
-      throw new Error('invalid string table value');
-    }
     this.dataoffs = view.getInt32(20, true);
-    if (this.dataoffs < this.Size) {
-      throw new Error('invalid data offset value');
-    }
     this.sections = [];
 
     switch (this.compression) {
       case CompressionType.None:
         this.data = data;
-        this.readSections();
         break;
 
       case CompressionType.Gz:
+        if (this.version >= this.SP_VERSION_2) {
+          throw new Error('v2 code does not support compression');
+        }
+
+        if (this.disksize > data.byteLength) {
+          throw new Error('invalid disksize');
+        }
+        // The inflated size must be at least as large as the compressed size.
+        if (this.imagesize < this.disksize) {
+          throw new Error('invalid imagesize');
+        }
+        // The start of the compression cannot be larger than the file.
+        if (this.dataoffs > data.byteLength) {
+          throw new Error('illegal compressed region');
+        }
+        // The compressed region must start after the header.
+        if (this.dataoffs < this.Size) {
+          throw new Error('illegal compressed region');
+        }
+
         const content = new Uint8Array(data);
         this.data = new ArrayBuffer(this.imagesize);
         const array = new Uint8Array(this.data);
@@ -119,11 +136,15 @@ export class FileHeader {
         const compressed = content.slice(this.dataoffs + 2, this.disksize);
         const result = inflateRaw(compressed);
         array.set(result, this.dataoffs);
-        this.readSections();
         break;
       default:
         throw new Error('unknown compression type');
     }
+
+    if (this.stringtab >= this.data.byteLength) {
+      throw new Error('invalid string table value');
+    }
+    this.readSections();
 
     this.debugUnpacked = false;
   }
@@ -163,7 +184,7 @@ export class FileHeader {
     // There was a brief period of incompatibility, where version == 0x0101
     // and the packing changed, at the same time .dbg.natives was introduced.
     // Once the incompatibility was noted, version was bumped to 0x0102.
-    this.debugUnpacked = this.version === this.SP1_VERSION_1_0 && !foundDbgNativeSection;
+    this.debugUnpacked = this.version === this.SP_VERSION_1_0 && !foundDbgNativeSection;
   }
 
   private stringAt(index: number): string {

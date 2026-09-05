@@ -17,7 +17,7 @@ export class SmxCodeV1Section extends SmxSection {
     this.codeheader.flags = view.getUint16(6, true);
     this.codeheader.main = view.getUint32(8, true);
     this.codeheader.codeoffs = view.getUint32(12, true);
-    if (this.codeheader.codeversion >= CodeV1Header.VERSION_FEATURES) {
+    if (this.codeheader.codeversion >= CodeV1Header.CODE_VERSION_FEATURE_MASK) {
       this.codeheader.features = view.getUint32(16, true);
     }
   }

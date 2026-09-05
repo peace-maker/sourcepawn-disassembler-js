@@ -1,5 +1,5 @@
 export class RttiMethodEntry {
-  public static readonly Size: number = 16;
+  public static readonly Size: number = 24;
 
   // Offset into the .names section.
   public nameoffs!: number;
@@ -12,6 +12,12 @@ export class RttiMethodEntry {
 
   // TypeId.
   public signature!: number;
+
+  // Local variable signatures, or 0 if no locals.
+  public locals!: number;
+
+  // See RttiMethodFlags
+  public flags!: number;
 
   // Computed name.
   public name!: string;

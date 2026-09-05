@@ -18,7 +18,7 @@ export enum V1Opcode {
   STOR_ALT,
   STOR_S_PRI,
   STOR_S_ALT,
-  UNGEN_SREF_PRI,
+  STOR_S_C,
   UNGEN_SREF_ALT,
   SREF_S_PRI,
   SREF_S_ALT,
@@ -92,7 +92,7 @@ export enum V1Opcode {
   ZERO_ALT,
   ZERO,
   ZERO_S,
-  UNGEN_SIGN_PRI,
+  ZERO_S_I64,
   UNGEN_SIGN_ALT,
   EQ,
   NEQ,
@@ -216,12 +216,13 @@ export enum V1Opcode {
   OR_I64,
   AND_I64,
   XOR_I64,
-  STOR_S_I64_C,
+  STOR_S_C_I64,
   SLESS_I64,
   SLEQ_I64,
   SGRTR_I64,
   SGEQ_I64,
   SMOD_ALT_I64,
+  STOR_S_PRI_I64,
 
   // These opcodes are internal to the compiler and not part of the ABI. They
   // are used to implement peephole optimizations on legacy float natives. When

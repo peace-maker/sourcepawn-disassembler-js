@@ -22,6 +22,9 @@ export class RttiClassDefEntry {
   public reserved2!: number;
   public reserved3!: number;
 
+  // Index into rtti.methods section table.
+  public firstMethod!: number;
+
   // Computed name.
   public name!: string;
 }

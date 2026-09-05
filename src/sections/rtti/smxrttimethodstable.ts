@@ -18,6 +18,9 @@ export class SmxRttiMethodTable extends SmxRttiListTable {
       entry.pcodeStart = view.getUint32(i * this.rowsize + 4, true);
       entry.pcodeEnd = view.getUint32(i * this.rowsize + 8, true);
       entry.signature = view.getUint32(i * this.rowsize + 12, true);
+      if (this.rowsize >= 20) {
+        entry.locals = view.getUint32(i * this.rowsize + 16, true);
+      }
       entry.name = names.stringAt(entry.nameoffs);
       this.methods[i] = entry;
     }

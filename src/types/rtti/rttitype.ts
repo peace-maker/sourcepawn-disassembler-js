@@ -103,18 +103,31 @@ export class RttiType {
     switch (this.type) {
       case TypeFlag.Bool:
         return attributes + 'bool';
+      case TypeFlag.Int16:
+        return attributes + 'int16';
       case TypeFlag.Int32:
         return attributes + 'int';
+      case TypeFlag.Int64:
+        return attributes + 'int64';
+      case TypeFlag.IntPtr:
+        return attributes + 'intptr';
       case TypeFlag.Float32:
         return attributes + 'float';
+      case TypeFlag.Float64:
+        return attributes + 'double';
+      case TypeFlag.Int8:
+        return attributes + 'int8';
       case TypeFlag.Char8:
         return attributes + 'char';
       case TypeFlag.Any:
         return attributes + 'any';
       case TypeFlag.TopFunction:
         return attributes + 'Function';
+      case TypeFlag.TopObject:
+        return attributes + 'object';
       case TypeFlag.Void:
         return attributes + 'void';
+      case TypeFlag.FlatArray:
       case TypeFlag.FixedArray:
         return attributes + this.innerType.toString() + '[' + this.index + ']';
       case TypeFlag.Array:
@@ -126,7 +139,7 @@ export class RttiType {
         }
         return attributes + `<enum ${this.index}>`;
       }
-      case TypeFlag.Typedef: {
+      case TypeFlag.ObsoleteTypedef: {
         if (this.rttiEntry) {
           const typedef = this.rttiEntry as RttiTypedefEntry;
           return attributes + typedef.name;

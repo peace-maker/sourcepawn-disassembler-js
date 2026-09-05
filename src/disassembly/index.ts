@@ -3,3 +3,4 @@ export * from './v1instruction';
 export * from './v1opcode';
 export * from './v1opcodeinfo';
 export * from './v1param';
+export * from './v2opcode';

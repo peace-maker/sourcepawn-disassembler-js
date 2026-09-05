@@ -34,7 +34,7 @@ export class TypeBuilder {
     const argc = this.bytes[this.offset++];
 
     const func = new RttiType(TypeFlag.Function);
-    if (this.bytes[this.offset] === TypeFlag.Variadic) {
+    if (this.bytes[this.offset] === TypeFlag.LegacyVariadic) {
       func.setVariadic();
       this.offset++;
     }
@@ -79,11 +79,17 @@ export class TypeBuilder {
     const b = this.bytes[this.offset++];
     switch (b) {
       case TypeFlag.Bool:
+      case TypeFlag.Int16:
       case TypeFlag.Int32:
+      case TypeFlag.Int64:
+      case TypeFlag.IntPtr:
       case TypeFlag.Float32:
+      case TypeFlag.Float64:
+      case TypeFlag.Int8:
       case TypeFlag.Char8:
       case TypeFlag.Any:
-      case TypeFlag.TopFunction: {
+      case TypeFlag.TopFunction:
+      case TypeFlag.TopObject: {
         type = new RttiType(b);
         break;
       }
@@ -104,7 +110,7 @@ export class TypeBuilder {
         type.setRttiEntry(this.smxFile.rttiEnums.enums[type.index]);
         break;
       }
-      case TypeFlag.Typedef: {
+      case TypeFlag.ObsoleteTypedef: {
         type = new RttiType(b);
         type.setIndex(this.decodeUint32());
         type.setRttiEntry(this.smxFile.rttiTypedefs.typedefs[type.index]);

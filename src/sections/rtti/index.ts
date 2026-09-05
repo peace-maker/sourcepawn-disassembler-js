@@ -8,6 +8,7 @@ export * from './smxrttienumstructfieldstable';
 export * from './smxrttienumstructstable';
 export * from './smxrttienumtable';
 export * from './smxrttifieldstable';
+export * from './smxrttiglobalstable';
 export * from './smxrttilisttable';
 export * from './smxrttimethodstable';
 export * from './smxrttinativestable';

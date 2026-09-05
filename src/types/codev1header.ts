@@ -18,9 +18,18 @@ export enum CodeV1Features {
 export class CodeV1Header {
   public static readonly Size: number = 16;
 
-  public static readonly VERSION_JIT1: number = 9;
-  public static readonly VERSION_JIT2: number = 10;
-  public static readonly VERSION_FEATURES: number = 13;
+  // Version 9: Initial version.
+  // Version 10: DEBUG code flag removed; no bytecode changes.
+  // Version 11: Not used; no changes.
+  // Version 12: PROC/RETN semantic changes.
+  // Version 13: Feature flags in code headers.
+  // Version 14: The stack and locals are now typed.
+  public static readonly CODE_VERSION_MINIMUM: number = 9;
+  public static readonly CODE_VERSION_SM_LEGACY: number = 10;
+  public static readonly CODE_VERSION_FEATURE_MASK: number = 13;
+  public static readonly CODE_VERSION_TYPED_STACK: number = 14;
+  public static readonly CODE_VERSION_CURRENT: number = CodeV1Header.CODE_VERSION_TYPED_STACK;
+  public static readonly CODE_VERSION_ALWAYS_REJECT: number = 0x7f;
 
   // Size of the code blob.
   public codesize!: number;

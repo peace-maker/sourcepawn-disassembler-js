@@ -1,6 +1,7 @@
 import { V1Disassembler } from './disassembly/v1disassembler';
 import { FileHeader } from './fileheader';
 import { SectionEntry } from './sectionentry';
+import { SmxPStructValueTable, SmxRttiListTable, SmxPStructGlobalTable, SmxRttiGlobalsTable } from './sections';
 import { SmxDebugGlobalsTable } from './sections/rtti/smxdebugglobalstable';
 import { SmxDebugLocalsTable } from './sections/rtti/smxdebuglocalstable';
 import { SmxDebugMethodTable } from './sections/rtti/smxdebugmethodstable';
@@ -41,6 +42,8 @@ export class SourcePawnFile {
   public publics!: SmxPublicTable;
   public pubvars!: SmxPubvarTable;
   public tags!: SmxTagTable;
+  public pstructGlobals!: SmxPStructGlobalTable;
+  public pstructValues!: SmxPStructValueTable;
 
   public data!: SmxDataSection;
   public code!: SmxCodeV1Section;
@@ -52,6 +55,7 @@ export class SourcePawnFile {
   public debugSymbols!: SmxLegacyDebugSymbolTable;
 
   public debugMethods!: SmxDebugMethodTable;
+  public debugMethodLines!: SmxRttiListTable;
   public debugGlobals!: SmxDebugGlobalsTable;
   public debugLocals!: SmxDebugLocalsTable;
   public rttiData!: SmxRttiDataSection;
@@ -60,8 +64,10 @@ export class SourcePawnFile {
   public rttiEnumStructs!: SmxRttiEnumStructTable;
   public rttiEnumStructFields!: SmxRttiEnumStructFieldTable;
   public rttiFields!: SmxRttiFieldTable;
+  public rttiGlobals!: SmxRttiGlobalsTable;
   public rttiMethods!: SmxRttiMethodTable;
   public rttiNatives!: SmxRttiNativeTable;
+  public rttiStringPool!: SmxRttiListTable;
   public rttiTypedefs!: SmxRttiTypedefTable;
   public rttiTypesets!: SmxRttiTypesetTable;
 
@@ -275,6 +281,12 @@ export class SourcePawnFile {
         case '.code':
           this.code = new SmxCodeV1Section(this.header, section);
           break;
+        case 'pstruct_glb':
+          this.pstructGlobals = new SmxPStructGlobalTable(this.header, section, this.names);
+          break;
+        case 'pstruct_val':
+          this.pstructValues = new SmxPStructValueTable(this.header, section, this.names);
+          break;
         case '.dbg.files':
           this.debugFiles = new SmxDebugFileTable(this.header, section, this.debugNames);
           break;
@@ -295,6 +307,9 @@ export class SourcePawnFile {
           break;
         case '.dbg.methods':
           this.debugMethods = new SmxDebugMethodTable(this.header, section, this.debugLocals);
+          break;
+        case '.dbg.methods_lines':
+          this.debugMethodLines = new SmxRttiListTable(this.header, section);
           break;
         case '.dbg.globals':
           this.debugGlobals = new SmxDebugGlobalsTable(this.header, section, this.names);
@@ -317,11 +332,17 @@ export class SourcePawnFile {
         case 'rtti.fields':
           this.rttiFields = new SmxRttiFieldTable(this.header, section, this.names);
           break;
+        case 'rtti.globals':
+          this.rttiGlobals = new SmxRttiGlobalsTable(this.header, section, this.names);
+          break;
         case 'rtti.methods':
           this.rttiMethods = new SmxRttiMethodTable(this.header, section, this.names);
           break;
         case 'rtti.natives':
           this.rttiNatives = new SmxRttiNativeTable(this.header, section, this.names);
+          break;
+        case 'rtti.stringpool':
+          this.rttiStringPool = new SmxRttiListTable(this.header, section);
           break;
         case 'rtti.typedefs':
           this.rttiTypedefs = new SmxRttiTypedefTable(this.header, section, this.names);

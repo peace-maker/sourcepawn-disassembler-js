@@ -8,6 +8,8 @@ export * from './debugnativeentry';
 export * from './debugsymboldimentry';
 export * from './debugsymbolentry';
 export * from './nativeentry';
+export * from './pstructglobalentry';
+export * from './pstructvalueentry';
 export * from './publicentry';
 export * from './pubvarentry';
 export * from './symkind';

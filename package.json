@@ -6,6 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "test-parse": "tsc --target es2018 --module commonjs --outDir .tmp-test test-parse.ts && node .tmp-test/test-parse.js",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",

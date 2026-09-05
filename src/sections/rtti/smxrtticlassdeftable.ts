@@ -17,10 +17,16 @@ export class SmxRttiClassDefTable extends SmxRttiListTable {
       entry.flags = view.getUint32(i * this.rowsize + 0, true);
       entry.nameoffs = view.getUint32(i * this.rowsize + 4, true);
       entry.firstField = view.getUint32(i * this.rowsize + 8, true);
-      entry.reserved0 = view.getUint32(i * this.rowsize + 12, true);
-      entry.reserved1 = view.getUint32(i * this.rowsize + 16, true);
-      entry.reserved2 = view.getUint32(i * this.rowsize + 20, true);
-      entry.reserved3 = view.getUint32(i * this.rowsize + 24, true);
+      // The old compiler expects the v1 classdef layout which includes reserved
+      // fields that were removed from the current smx-typeinfo.h.
+      if (this.file.version < this.file.SP_VERSION_2) {
+        entry.reserved0 = view.getUint32(i * this.rowsize + 12, true);
+        entry.reserved1 = view.getUint32(i * this.rowsize + 16, true);
+        entry.reserved2 = view.getUint32(i * this.rowsize + 20, true);
+        entry.reserved3 = view.getUint32(i * this.rowsize + 24, true);
+      } else {
+        entry.firstMethod = view.getUint32(i * this.rowsize + 12, true);
+      }
       entry.name = names.stringAt(entry.nameoffs);
       this.classdefs[i] = entry;
     }

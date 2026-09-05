@@ -1,23 +1,36 @@
 export enum TypeFlag {
   Bool = 0x01,
+  Int16 = 0x05,
   Int32 = 0x06,
+  Int64 = 0x07,
+  IntPtr = 0x08,
+  Int8 = 0x09,
   Float32 = 0x0c,
+  Float64 = 0x0d,
   Char8 = 0x0e,
   Any = 0x10,
   TopFunction = 0x11,
+  TopObject = 0x12,
 
   FixedArray = 0x30,
   Array = 0x31,
+  FlatArray = 0x34,
+
   Function = 0x32,
+  FunctionPtr = 0x33,
 
   Enum = 0x42,
-  Typedef = 0x43,
+  ObsoleteTypedef = 0x43,
   Typeset = 0x44,
   Classdef = 0x45,
   EnumStruct = 0x46,
+  Class = 0x47,
+
+  LocalSlots = 0x60,
+  ClosureSlots = 0x61,
 
   Void = 0x70,
-  Variadic = 0x71,
+  LegacyVariadic = 0x71,
   ByRef = 0x72,
   Const = 0x73,
 }

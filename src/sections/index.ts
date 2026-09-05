@@ -7,6 +7,8 @@ export * from './smxdebugnativetable';
 export * from './smxlegacydebugsymboltable';
 export * from './smxnametable';
 export * from './smxnativetable';
+export * from './smxpstructglobaltable';
+export * from './smxpstructvaluetable';
 export * from './smxpublictable';
 export * from './smxpubvartable';
 export * from './smxsection';

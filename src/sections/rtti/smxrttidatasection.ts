@@ -1,7 +1,7 @@
 import { FileHeader } from '../../fileheader';
 import { SectionEntry } from '../../sectionentry';
 import { SourcePawnFile } from '../../sourcepawnfile';
-import { RttiType } from '../../types';
+import { RttiType, TypeFlag } from '../../types';
 import { TypeBuilder } from '../../types/rtti/typebuilder';
 import { TypeId } from '../../types/rtti/typeid';
 import { SmxSection } from '../smxsection';
@@ -46,5 +46,35 @@ export class SmxRttiDataSection extends SmxSection {
   public typesetTypesFromOffset(offset: number): RttiType {
     const tb = new TypeBuilder(this.smxFile, this.bytes, offset);
     return tb.decodeTypeset();
+  }
+
+  public localTypesFromOffset(offset: number): string[] {
+    if (offset === 0) {
+      return [];
+    }
+
+    if (offset >= this.bytes.length) {
+      throw new Error('Local types offset is out of bounds: ' + offset);
+    }
+
+    if (this.bytes[offset] !== TypeFlag.LocalSlots) {
+      throw new Error('Expected local slots type flag at offset: ' + offset);
+    }
+    offset++;
+
+    if (offset + 2 >= this.bytes.length) {
+      throw new Error('Local types count is out of bounds: ' + offset);
+    }
+    const count = this.bytes[offset] | (this.bytes[offset + 1] << 8);
+    offset += 2;
+
+    const result: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const tb = new TypeBuilder(this.smxFile, this.bytes, offset);
+      const text = tb.decodeNew();
+      offset = tb.offset;
+      result.push(text.toString());
+    }
+    return result;
   }
 }
